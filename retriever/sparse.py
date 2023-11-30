@@ -26,14 +26,20 @@ class BM25Retriever:
     def load(self):
         self.retriever: langchain_BM25Retriever = from_pkl(self.model_path)
 
-    def retrieve(self, query: str, topk: int) -> list[str]:
+    def retrieve(self,
+                 query: str,
+                 topk: int
+                 ) -> list[str]:
         results = self.retriever.get_relevant_documents(query)
         docs = []
         for result in results[:topk]:
             docs.append(result.page_content)
         return docs
 
-    def augment(self, query: str, prompt: str) -> str:
+    def augment(self,
+                query: str,
+                prompt: str
+                ) -> str:
         topk = 2
         docs = self.retrieve(query, topk)
         context = ''
@@ -63,14 +69,20 @@ class ESBM25Retriever:
         self.texts = [doc['page_content'] for doc in self.docs]
         self.retriever = ElasticSearchBM25Retriever.create(self.elasticsearch_url, "langchain-index")
 
-    def retrieve(self, query: str, topk: int) -> list[str]:
+    def retrieve(self,
+                 query: str,
+                 topk: int
+                 ) -> list[str]:
         results = self.retriever.get_relevant_documents(query)
         docs = []
         for result in results[:topk]:
             docs.append(result.page_content)
         return docs
 
-    def augment(self, query: str, prompt: str) -> str:
+    def augment(self,
+                query: str,
+                prompt: str
+                ) -> str:
         topk = 2
         docs = self.retrieve(query, topk)
         context = ''
@@ -97,14 +109,20 @@ class TFIDFRetriever:
     def load(self):
         self.retriever: langchain_TFIDFRetriever = from_pkl(self.model_path)
 
-    def retrieve(self, query: str, topk: int) -> list[str]:
+    def retrieve(self,
+                 query: str,
+                 topk: int
+                 ) -> list[str]:
         results = self.retriever.get_relevant_documents(query)
         docs = []
         for result in results[:topk]:
             docs.append(result.page_content)
         return docs
 
-    def augment(self, query: str, prompt: str) -> str:
+    def augment(self,
+                query: str,
+                prompt: str
+                ) -> str:
         topk = 2
         docs = self.retrieve(query, topk)
         context = ''
