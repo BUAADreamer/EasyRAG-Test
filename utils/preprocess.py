@@ -48,9 +48,13 @@ def tokenize(texts: list[str], tokenizer: PreTrainedTokenizerBase) -> list[list[
     N = len(texts)
     tokens_ls = []
     print("tokenize...")
-    for i in tqdm(range(0, N, bs)):
-        max_id = min(N, i + bs)
-        token_ids_ls = tokenizer(texts[i:max_id])['input_ids']
-        tokens_ls_ = [tokenizer.convert_ids_to_tokens(token_ids) for token_ids in token_ids_ls]
-        tokens_ls.extend(tokens_ls_)
+    if N > 1:
+        for i in tqdm(range(0, N, bs)):
+            max_id = min(N, i + bs)
+            token_ids_ls = tokenizer(texts[i:max_id])['input_ids']
+            tokens_ls_ = [tokenizer.convert_ids_to_tokens(token_ids) for token_ids in token_ids_ls]
+            tokens_ls.extend(tokens_ls_)
+    else:
+        token_ids_ls = tokenizer(texts)['input_ids']
+        tokens_ls = [tokenizer.convert_ids_to_tokens(token_ids) for token_ids in token_ids_ls]
     return tokens_ls

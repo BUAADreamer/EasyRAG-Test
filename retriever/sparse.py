@@ -51,7 +51,7 @@ class BM25Retriever:
         results = self.retriever.get_top_n(query, self.texts, topk)
         docs = []
         for result in results[:topk]:
-            docs.append(result.page_content)
+            docs.append(result)
         return docs
 
     def augment(self,
