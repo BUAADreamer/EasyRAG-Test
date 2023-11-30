@@ -1,6 +1,6 @@
 import fire
 from utils import from_yaml
-from retriever import DenseRetriever, BM25Retriever, ESBM25Retriever, TFIDFRetriever
+from retriever import DenseRetriever, BM25Retriever, TFIDFRetriever
 
 
 def get_retriever(cfg):
@@ -9,8 +9,6 @@ def get_retriever(cfg):
         retriever = DenseRetriever(cfg)
     elif method == 'bm25':
         retriever = BM25Retriever(cfg)
-    elif method == 'esbm25':
-        retriever = ESBM25Retriever(cfg)
     elif method == 'tfidf':
         retriever = TFIDFRetriever(cfg)
     return retriever

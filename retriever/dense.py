@@ -25,6 +25,7 @@ class DenseRetriever:
         self.db.save_local(self.index_path)
 
     def load(self):
+        print("obtaining retriever and docs...")
         self.hf_embed_model = HuggingFaceEmbeddings(
             model_name=self.cfg['embed_name'],
             model_kwargs=self.cfg['model_kwargs'],

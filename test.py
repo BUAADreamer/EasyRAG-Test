@@ -53,7 +53,7 @@ class AeroEval:
         self.retriever = load_retriever(config_path)
         self.cfgs = from_yaml(config_path)
         model_name_or_path = self.cfgs['llm_name']
-        self.model = AutoModelForCausalLM.from_pretrained(
+        self.model: PreTrainedModel = AutoModelForCausalLM.from_pretrained(
             model_name_or_path,
             trust_remote_code=True,
             device_map="auto",
@@ -63,7 +63,7 @@ class AeroEval:
                 else torch.float32
             ),
         ).eval()
-        self.tokenizer = AutoTokenizer.from_pretrained(
+        self.tokenizer: PreTrainedTokenizerBase = AutoTokenizer.from_pretrained(
             model_name_or_path,
             trust_remote_code=True,
             use_fast=True,
