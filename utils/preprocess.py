@@ -47,7 +47,6 @@ def tokenize(texts: list[str], tokenizer: PreTrainedTokenizerBase) -> list[list[
     bs = 1000000
     N = len(texts)
     tokens_ls = []
-    print("tokenize...")
     if N > 1:
         for i in tqdm(range(0, N, bs)):
             max_id = min(N, i + bs)
