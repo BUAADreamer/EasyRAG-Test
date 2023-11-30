@@ -1,0 +1,10 @@
+{
+  "aero_basic": {
+    "name": "航空航天基础",
+    "category": "STEM"
+  },
+  "aero_hard": {
+    "name": "航空航天进阶",
+    "category": "STEM"
+  }
+}

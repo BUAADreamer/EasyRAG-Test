@@ -1,0 +1,19 @@
+llm_name: baichuan-inc/Baichuan2-7B-Base
+chunk_size: 100
+chunk_overlap: 50
+embed_name: BAAI/bge-small-zh-v1.5
+model_kwargs: {
+  device: cuda
+}
+encode_kwargs: {
+  normalize_embeddings: True
+}
+meta_datas: [
+    {
+        path: "data/zhwiki.jsonl",
+        desc: "zhwikipedia",
+    },
+]
+output_path: outputs/bge_small
+method: dense
+

@@ -1,0 +1,12 @@
+llm_name: baichuan-inc/Baichuan2-7B-Base
+chunk_size: 100
+chunk_overlap: 50
+meta_datas: [
+    {
+        path: "data/zhwiki.jsonl",
+        desc: "zhwikipedia",
+    },
+]
+output_path: outputs/esbm25
+method: esbm25
+elasticsearch_url: http://localhost:9200
