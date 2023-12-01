@@ -9,4 +9,4 @@ meta_datas: [
 ]
 output_path: outputs/bm25
 retriever: bm25
-model: rallm
+model: icralm

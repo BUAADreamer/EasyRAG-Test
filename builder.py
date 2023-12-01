@@ -21,7 +21,7 @@ def get_retriever(cfg) -> BaseRetriever:
 
 def get_model(cfg) -> RALLM:
     method = cfg['model']
-    if method == 'rallm':
+    if method == 'icralm':
         model = RALLM(cfg)
     elif method == 'replug':
         model = REPLUG(cfg)

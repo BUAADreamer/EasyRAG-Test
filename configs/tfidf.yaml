@@ -9,4 +9,4 @@ meta_datas: [
 ]
 output_path: outputs/tfidf
 retriever: tfidf
-model: rallm
+model: icralm
