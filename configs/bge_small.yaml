@@ -9,11 +9,11 @@ encode_kwargs: {
   normalize_embeddings: True
 }
 meta_datas: [
-    {
-        path: "data/zhwiki.jsonl",
-        desc: "zhwikipedia",
-    },
+  {
+    path: "data/zhwiki.jsonl",
+    desc: "zhwikipedia",
+  },
 ]
 output_path: outputs/bge_small
-method: dense
-
+retriever: dense
+model: rallm

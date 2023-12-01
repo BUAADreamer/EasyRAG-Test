@@ -3,17 +3,10 @@ import argparse
 import json
 import os
 from tqdm import tqdm
-import numpy as np
 import torch
 from datasets import load_dataset
-from transformers import (
-    AutoModelForCausalLM,
-    AutoTokenizer,
-    PreTrainedModel,
-    PreTrainedTokenizerBase,
-)
-from builder import load_retriever
-from utils import from_yaml
+
+from builder import load_model
 
 
 def parse_argument():
@@ -50,31 +43,11 @@ class AeroEval:
             wo_rag: bool,
             config_path: str,
     ):
-        self.retriever = load_retriever(config_path)
-        self.cfgs = from_yaml(config_path)
-        model_name_or_path = self.cfgs['llm_name']
-        self.model: PreTrainedModel = AutoModelForCausalLM.from_pretrained(
-            model_name_or_path,
-            trust_remote_code=True,
-            device_map="auto",
-            torch_dtype=(
-                torch.bfloat16
-                if torch.cuda.is_bf16_supported()
-                else torch.float32
-            ),
-        ).eval()
-        self.tokenizer: PreTrainedTokenizerBase = AutoTokenizer.from_pretrained(
-            model_name_or_path,
-            trust_remote_code=True,
-            use_fast=True,
-            add_bos_token=False,
-            add_eos_token=False,
-            padding_side="left",
-        )
+        self.wo_rag = wo_rag
+        self.rallm = load_model(config_path)
         if not os.path.exists(output_dir):
             os.mkdir(output_dir)
         self.output_dir = output_dir
-        self.wo_rag = wo_rag
 
     def run(self, shot: int, split: str):
         results, accs = {}, {}
@@ -105,36 +78,19 @@ class AeroEval:
         results = []
         acc = 0
         for data in tqdm(dataset[split]):
-            if self.wo_rag:
-                prompt = f"以下是中国关于{self.TASK2DESC[task_name]}考试的单项选择题，请选出其中的正确答案。\n"
-            else:
-                query = data['question']
-                prompt = '{}' + f'\n以下是中国关于{self.TASK2DESC[task_name]}考试的单项选择题，请参考这些文本选出其中的正确答案。\n'
-                prompt = self.retriever.augment(query, prompt)
+            prompt = f"以下是中国关于{self.TASK2DESC[task_name]}考试的单项选择题，请选出其中的正确答案。\n"
             if shot != 0:
                 shuffled = dataset["train"].shuffle()
                 for i in range(min(shot, len(shuffled))):
                     prompt += "\n" + self.build_example(shuffled[i], with_answer=True)
             prompt += "\n" + self.build_example(data, with_answer=False)
-            input_ids = self.tokenizer.encode(prompt, return_tensors="pt").cuda()
-
-            logits = self.model(
-                input_ids=input_ids,
-            ).logits[:, -1].flatten()
-
-            candidate_logits = [logits[self.tokenizer(label).input_ids[-1]] for label in ["A", "B", "C", "D"]]
-            candidate_logits = torch.tensor(candidate_logits).to(torch.float32)
-            probs = (
-                torch.nn.functional.softmax(
-                    candidate_logits,
-                    dim=0,
-                )
-                .detach()
-                .cpu()
-                .numpy()
-            )
-            answer = {i: k for i, k in enumerate(["A", "B", "C", "D"])}[np.argmax(probs)]
-
+            data['query'] = data['question']
+            if self.wo_rag:
+                self.rallm.prompt = prompt
+                self.rallm.simple_read()
+            else:
+                self.rallm.retrieve_and_read(prompt, data)
+            answer = self.rallm.generate_choice()
             results.append(
                 {
                     "prompt": prompt,

@@ -1,11 +1,14 @@
 import os.path
-from langchain import FAISS
+from langchain.vectorstores import FAISS
 from langchain.embeddings import HuggingFaceEmbeddings
+
+from retrievers.base import BaseRetriever
 from utils.preprocess import get_docs
 
 
-class DenseRetriever:
+class DenseRetriever(BaseRetriever):
     def __init__(self, cfg: dict):
+        super().__init__()
         self.cfg = cfg
         self.output_path = self.cfg['output_path']
         self.index_path = os.path.join(self.output_path, 'index')
@@ -36,19 +39,21 @@ class DenseRetriever:
     def retrieve(self,
                  query: str,
                  topk: int
-                 ) -> list[str]:
+                 ) -> tuple[list[str], list[float]]:
         docs_and_scores = self.db.similarity_search_with_score(query)
         docs = []
+        scores = []
         for doc_and_score in docs_and_scores[:topk]:
             docs.append(doc_and_score[0].page_content)
-        return docs
+            scores.append(doc_and_score[1])
+        return docs, scores
 
     def augment(self,
                 query: str,
                 prompt: str
                 ) -> str:
         topk = 2
-        docs = self.retrieve(query, topk)
+        docs, _ = self.retrieve(query, topk)
         context = ''
         for doc in docs:
             context += doc + '\n'

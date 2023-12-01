@@ -8,4 +8,5 @@ meta_datas: [
     },
 ]
 output_path: outputs/bm25
-method: bm25
+retriever: bm25
+model: rallm
