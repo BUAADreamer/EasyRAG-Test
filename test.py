@@ -11,7 +11,7 @@ from builder import load_model
 
 def parse_argument():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config", type=str, default='configs/bge_small.yaml')
+    parser.add_argument("--config", type=str, default='private_configs/bge_small.yaml')
     parser.add_argument(
         "--shot", type=int, default=5, help="number of shot for few-shot learning"
     )
@@ -19,7 +19,7 @@ def parse_argument():
         "--split", type=str, default="test", help="split of dataset to evaluate"
     )
     parser.add_argument(
-        "--output_dir", type=str, default="aeroeval_output", help="output directory"
+        "--output_dir", type=str, default="output", help="output directory"
     )
     parser.add_argument(
         "--wo_rag", action='store_true', default=False, help="with out using retrieval-augmented generation"
@@ -57,10 +57,10 @@ class Eval:
             results[task_name] = result
             accs[task_name] = acc
             result_path = os.path.join(self.output_dir, f"{task_name}.json")
-            with open(result_path, "w") as f:
-                json.dump(result, f, indent=2)
+            with open(result_path, "w", encoding='utf-8') as f:
+                json.dump(result, f, indent=2, ensure_ascii=False)
             print(f"save result to {result_path}")
-
+            print(f"{task_name} acc:{acc}")
         # results
         acc_path = os.path.join(self.output_dir, "acc.json")
         with open(acc_path, "w", encoding='utf-8') as f:
@@ -74,8 +74,10 @@ class Eval:
         dataset = load_dataset(self.data_path, task_name)
         results = []
         acc = 0
-        for data in tqdm(dataset[split]):
-            prompt = f"以下是中国关于{self.TASK2DESC[task_name]['name']}的单项选择题，请选出其中的正确答案。\n"
+        print(dataset)
+        w = tqdm(dataset[split], desc='已答对0道题')
+        for data in w:
+            prompt = f"以下是中国关于{self.TASK2DESC[task_name]['name']}考试的单项选择题，请选出其中的正确答案。\n"
             if shot != 0:
                 shuffled = dataset["train"].shuffle()
                 for i in range(min(shot, len(shuffled))):
@@ -93,9 +95,11 @@ class Eval:
                     "prompt": prompt,
                     "correct": answer == data["answer"].strip().upper(),
                     "answer": answer,
+                    "ground_truth": data['answer']
                 }
             )
             acc += answer == data["answer"].strip().upper()
+            w.set_description(f'已答对{acc}道题')
         acc /= len(dataset[split])
         return results, acc
 

@@ -50,12 +50,13 @@ class DenseRetriever(BaseRetriever):
 
     def augment(self,
                 query: str,
-                prompt: str
+                prompt: str,
+                prefix: str = ''
                 ) -> str:
         topk = 2
         docs, _ = self.retrieve(query, topk)
         context = ''
         for doc in docs:
             context += doc + '\n'
-        prompt = prompt.format(context)
+        prompt = prefix + context + prompt
         return prompt

@@ -43,7 +43,7 @@ class ICRALM(RALLM):
         :param data: at least contains 'query' key
         """
         query = data['query']
-        prompt = '{}\n请根据这些检索到的文本回答下列题目\n' + prompt
+        prompt = '\n请根据这些检索到的文本回答下列题目\n' + prompt
         self.prompt = self.retriever.augment(query, prompt)
 
     def read(self) -> None:
