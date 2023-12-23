@@ -1,12 +1,13 @@
+from typing import Union
+
 import fire
-
-from models.rallm import RALLM, REPLUG
-from retrievers.base import BaseRetriever
 from utils import from_yaml
-from retrievers import DenseRetriever, BM25Retriever, TFIDFRetriever
+from models.base import RALLM
+from retrievers.base import BaseRetriever
 
 
-def get_retriever(cfg) -> BaseRetriever:
+def get_retriever(cfg: dict) -> BaseRetriever:
+    from retrievers import DenseRetriever, BM25Retriever, TFIDFRetriever
     method = cfg['retriever']
     if method == 'dense':
         retriever = DenseRetriever(cfg)
@@ -19,10 +20,11 @@ def get_retriever(cfg) -> BaseRetriever:
     return retriever
 
 
-def get_model(cfg) -> RALLM:
+def get_model(cfg: dict) -> RALLM:
+    from models.rallm import ICRALM, REPLUG
     method = cfg['model']
     if method == 'icralm':
-        model = RALLM(cfg)
+        model = ICRALM(cfg)
     elif method == 'replug':
         model = REPLUG(cfg)
     else:
@@ -31,26 +33,29 @@ def get_model(cfg) -> RALLM:
 
 
 def build_retriever(
-        config: str
+        config: Union[str, dict]
 ):
-    cfg = from_yaml(config)
-    retriever = get_retriever(cfg)
+    if isinstance(config, str):
+        config = from_yaml(config)
+    retriever = get_retriever(config)
     retriever.build()
 
 
 def load_model(
-        config: str
+        config: Union[str, dict]
 ) -> RALLM:
-    cfg = from_yaml(config)
-    model = get_model(cfg)
+    if isinstance(config, str):
+        config = from_yaml(config)
+    model = get_model(config)
     return model
 
 
 def load_retriever(
-        config: str
+        config: Union[str, dict]
 ) -> BaseRetriever:
-    cfg = from_yaml(config)
-    retriever = get_retriever(cfg)
+    if isinstance(config, str):
+        config = from_yaml(config)
+    retriever = get_retriever(config)
     retriever.load()
     return retriever
 

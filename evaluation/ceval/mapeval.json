@@ -1,0 +1,18 @@
+{
+  "accountant": {
+    "name": "注册会计师",
+    "category": "Other"
+  },
+  "advanced_mathematics": {
+    "name": "高等数学",
+    "category": "STEM"
+  },
+  "business_administration": {
+    "name": "工商管理",
+    "category": "Social Sciences"
+  },
+  "chinese_language_and_literature": {
+    "name": "中国语言文学",
+    "category": "Humanities"
+  }
+}

@@ -5,7 +5,7 @@ import os
 from tqdm import tqdm
 import torch
 from datasets import load_dataset
-
+from utils import from_json
 from builder import load_model
 
 
@@ -30,24 +30,21 @@ def parse_argument():
     return parser.parse_args()
 
 
-class AeroEval:
-    DATA_PATH = "evaluation/aeroeval"
-    TASK2DESC = {
-        # "aero_basic": "航空航天科普",
-        "aero_hard": "航空航天专业",
-    }
-
+class Eval:
     def __init__(
             self,
             output_dir: str,
             wo_rag: bool,
             config_path: str,
+            data_path: str
     ):
         self.wo_rag = wo_rag
         self.rallm = load_model(config_path)
         if not os.path.exists(output_dir):
             os.mkdir(output_dir)
         self.output_dir = output_dir
+        self.data_path = data_path
+        self.TASK2DESC = from_json(os.path.join(self.data_path, 'mapeval.json'))
 
     def run(self, shot: int, split: str):
         results, accs = {}, {}
@@ -74,11 +71,11 @@ class AeroEval:
 
     @torch.inference_mode()
     def run_single_task(self, task_name: str, shot: int, split: str):
-        dataset = load_dataset(self.DATA_PATH, task_name)
+        dataset = load_dataset(self.data_path, task_name)
         results = []
         acc = 0
         for data in tqdm(dataset[split]):
-            prompt = f"以下是中国关于{self.TASK2DESC[task_name]}考试的单项选择题，请选出其中的正确答案。\n"
+            prompt = f"以下是中国关于{self.TASK2DESC[task_name]['name']}的单项选择题，请选出其中的正确答案。\n"
             if shot != 0:
                 shuffled = dataset["train"].shuffle()
                 for i in range(min(shot, len(shuffled))):
@@ -118,8 +115,8 @@ class AeroEval:
 
 def main():
     args = parse_argument()
-    aeroeval = AeroEval(args.output_dir, args.wo_rag, args.config)
-    aeroeval.run(args.shot, args.split)
+    llmeval = Eval(args.output_dir, args.wo_rag, args.config, args.data_path)
+    llmeval.run(args.shot, args.split)
 
 
 if __name__ == "__main__":

@@ -3,17 +3,16 @@ import torch
 from transformers import PreTrainedModel, AutoModelForCausalLM, AutoTokenizer, PreTrainedTokenizerBase
 
 from builder import load_retriever
-from retrievers.base import BaseRetriever
-from utils import from_yaml
+from retrievers import BaseRetriever
 import torch.nn.functional as F
+from models.base import RALLM
 
 
-class RALLM:
-    def __init__(self,
-                 config_path: str,
-                 ):
-        self.cfg = from_yaml(config_path)
-        self.retriever: BaseRetriever = load_retriever(config_path)
+class ICRALM(RALLM):
+    def __init__(self, cfg: dict):
+        super().__init__(cfg)
+        self.cfg = cfg
+        self.retriever: BaseRetriever = load_retriever(self.cfg)
         self.model_name_or_path = self.cfg['llm_name']
         self.model: PreTrainedModel = AutoModelForCausalLM.from_pretrained(
             self.model_name_or_path,
@@ -86,8 +85,8 @@ class RALLM:
 
 
 class REPLUG(RALLM):
-    def __init__(self, config_path: str):
-        super().__init__(config_path)
+    def __init__(self, cfg: dict):
+        super().__init__(cfg)
         self.topk = 5
 
     def retrieve(self,

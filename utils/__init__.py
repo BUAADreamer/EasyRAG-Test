@@ -17,6 +17,13 @@ def to_json(
     return parsed_docs
 
 
+def from_json(
+        path: str
+):
+    with open(path, 'r') as f:
+        return json.loads(f.read())
+
+
 def from_yaml(
         path: str
 ):
