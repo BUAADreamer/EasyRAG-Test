@@ -40,12 +40,12 @@ class DenseRetriever(BaseRetriever):
                  query: str,
                  topk: int
                  ) -> tuple[list[str], list[float]]:
-        docs_and_scores = self.db.similarity_search_with_score(query)
+        docs_and_scores = self.db.similarity_search_with_score(query, k=topk)
         docs = []
         scores = []
         for doc_and_score in docs_and_scores[:topk]:
             docs.append(doc_and_score[0].page_content)
-            scores.append(doc_and_score[1])
+            scores.append(1 - doc_and_score[1])
         return docs, scores
 
     def augment(self,
@@ -53,7 +53,7 @@ class DenseRetriever(BaseRetriever):
                 prompt: str,
                 prefix: str = ''
                 ) -> str:
-        topk = 2
+        topk = 1
         docs, _ = self.retrieve(query, topk)
         context = ''
         for doc in docs:

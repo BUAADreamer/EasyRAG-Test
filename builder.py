@@ -21,12 +21,14 @@ def get_retriever(cfg: dict) -> BaseRetriever:
 
 
 def get_model(cfg: dict) -> RALLM:
-    from models.rallm import ICRALM, REPLUG
+    from models.rallm import ICRALM, REPLUG, SelfRAG
     method = cfg['model']
     if method == 'icralm':
         model = ICRALM(cfg)
     elif method == 'replug':
         model = REPLUG(cfg)
+    elif method == 'selfrag':
+        model = SelfRAG(cfg)
     else:
         raise NotImplementedError
     return model

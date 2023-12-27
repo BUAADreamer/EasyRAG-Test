@@ -1,0 +1,11 @@
+deepspeed
+numpy
+sentencepiece
+torch
+transformers
+xformers
+langchain
+rank_bm25
+sentence-transformers
+faiss-gpu
+accelerate

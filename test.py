@@ -40,8 +40,7 @@ class Eval:
     ):
         self.wo_rag = wo_rag
         self.rallm = load_model(config_path)
-        if not os.path.exists(output_dir):
-            os.mkdir(output_dir)
+        os.makedirs(output_dir, exist_ok=True)
         self.output_dir = output_dir
         self.data_path = data_path
         self.TASK2DESC = from_json(os.path.join(self.data_path, 'mapeval.json'))
@@ -74,7 +73,6 @@ class Eval:
         dataset = load_dataset(self.data_path, task_name)
         results = []
         acc = 0
-        print(dataset)
         w = tqdm(dataset[split], desc='已答对0道题')
         for data in w:
             prompt = f"以下是中国关于{self.TASK2DESC[task_name]['name']}考试的单项选择题，请选出其中的正确答案。\n"
@@ -84,12 +82,13 @@ class Eval:
                     prompt += "\n" + self.build_example(shuffled[i], with_answer=True)
             prompt += "\n" + self.build_example(data, with_answer=False)
             data['query'] = data['question']
-            if self.wo_rag:
-                self.rallm.prompt = prompt
-                self.rallm.simple_read()
-            else:
-                self.rallm.retrieve_and_read(prompt, data)
-            answer = self.rallm.generate_choice()
+            with torch.no_grad():
+                if self.wo_rag:
+                    self.rallm.prompt = prompt
+                    self.rallm.simple_read()
+                else:
+                    self.rallm.retrieve_and_read(prompt, data)
+                answer = self.rallm.generate_choice()
             results.append(
                 {
                     "prompt": prompt,
