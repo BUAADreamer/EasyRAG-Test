@@ -96,9 +96,11 @@ class ICRALM(RALLM):
         answer = {i: k for i, k in enumerate(label_ls)}[np.argmax(probs)]
         return int(answer)
 
-    def generate(self, prompt) -> str:
+    def generate(self, prompt, max_new_tokens=20) -> str:
+        self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
         model_inputs = self.tokenizer([prompt], return_tensors="pt").to('cuda')
-        generated_ids = self.model.generate(**model_inputs)
+        generated_ids = self.model.generate(**model_inputs, max_new_tokens=max_new_tokens,
+                                            pad_token_id=self.tokenizer.eos_token_id)
         output = self.tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
         return output
 
@@ -171,7 +173,7 @@ class SelfRAG(ICRALM):
         scores = []
         need_retrieve = False
         for i, score in enumerate(self.scores):
-            if score > 0.5:
+            if score > 0.7:
                 docs.append(self.docs[i])
                 scores.append(score)
                 need_retrieve = True
@@ -182,7 +184,7 @@ class SelfRAG(ICRALM):
                 reflect_score = 0
                 reflect_score += self.get_is_rel(doc)
                 prompt = doc + self.prompt
-                output = self.generate(prompt)
+                output = self.generate(prompt, 50)
                 reflect_score += self.get_is_sup(doc, output)
                 reflect_score += self.get_is_use(output)
                 reflect_scores.append(reflect_score)

@@ -1,34 +1,34 @@
 {
-  "high_school_biology": {
-    "name": "高中生物",
+  "advanced_mathematics": {
+    "name": "高等数学",
     "category": "STEM"
   },
-  "high_school_chemistry": {
-    "name": "高中化学",
+  "college_chemistry": {
+    "name": "大学化学",
     "category": "STEM"
   },
-  "high_school_chinese": {
-    "name": "高中语文",
-    "category": "Humanities"
-  },
-  "high_school_geography": {
-    "name": "高中地理",
-    "category": "Social Sciences"
-  },
-  "high_school_history": {
-    "name": "高中历史",
-    "category": "Humanities"
-  },
-  "high_school_mathematics": {
-    "name": "高中数学",
+  "college_physics": {
+    "name": "大学物理",
     "category": "STEM"
   },
-  "high_school_physics": {
-    "name": "高中物理",
+  "college_programming": {
+    "name": "大学编程",
     "category": "STEM"
   },
-  "high_school_politics": {
-    "name": "高中政治",
-    "category": "Social Sciences"
+  "computer_architecture": {
+    "name": "计算机组成",
+    "category": "STEM"
+  },
+  "computer_network": {
+    "name": "计算机网络",
+    "category": "STEM"
+  },
+  "operating_system": {
+    "name": "操作系统",
+    "category": "STEM"
+  },
+  "discrete_mathematics": {
+    "name": "离散数学",
+    "category": "STEM"
   }
 }
